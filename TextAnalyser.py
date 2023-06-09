@@ -2,27 +2,28 @@ class TextAnalyser:
    def __init__(self, file_name=None):
       if not file_name: 
          raise Exception("Не указан файл для анализа!")
-      self.read_file(file_name)
-      if not self.text:
-         raise Exception(f"файл {file_name} пуст!")
-      else:
-         self.text_lower()
-         self.print_text()
+      self.file_name = file_name
+      self.read_file()
+      self.text_preparation()
+      self.print_text()
    
-   def read_file(self, file_name):
+   def read_file(self):
       try:
-         with open(file_name, 'r', encoding="UTF-8") as file:
+         with open(self.file_name, 'r', encoding="UTF-8") as file:
             self.file = file
             self.text = self.file.read()
       except FileNotFoundError:
-         raise Exception(f"файл {file_name} не найден!")
+         raise Exception(f"файл {self.file_name} не найден!")
    
    def print_text(self):
       print(self.text)
    
-   def text_lower(self):
+   def text_preparation(self):
+      if not self.text:
+         raise Exception(f"файл {self.file_name} пуст!")
       self.text = self.text.lower()
 
 
 text = TextAnalyser('text.txt')
+   
    
