@@ -4,7 +4,7 @@ class TextAnalyser:
          raise Exception("Не указан файл для анализа!")
       self.file_name = file_name
       self.read_file()
-      self.text_preparation()
+      self.prepare_text()
       self.print_text()
    
    def read_file(self):
@@ -18,12 +18,10 @@ class TextAnalyser:
    def print_text(self):
       print(self.text)
    
-   def text_preparation(self):
+   def prepare_text(self):
       if not self.text:
          raise Exception(f"файл {self.file_name} пуст!")
       self.text = self.text.lower()
 
 
 text = TextAnalyser('text.txt')
-   
-   
