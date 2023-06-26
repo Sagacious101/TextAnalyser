@@ -1,27 +1,60 @@
-class TextAnalyser:
-   def __init__(self, file_name=None):
-      if not file_name: 
-         raise Exception("Не указан файл для анализа!")
-      self.file_name = file_name
-      self.read_file()
-      self.prepare_text()
-      self.print_text()
-   
-   def read_file(self):
-      try:
-         with open(self.file_name, 'r', encoding="UTF-8") as file:
+import re
+from pathlib import Path
+from typing import NoReturn
+
+import chardet
+import pymorphy3
+
+
+class TextAnalyzer:
+    def __init__(self, file_path=None, pos=None) -> None:
+        if not file_path:
+            raise Exception("Ошибка! Не указан путь к файлу")
+        self.file_path = Path(file_path)
+
+        self.open_file()
+        self.get_text()
+        self.make_lower()
+        self.clean_text()
+        self.get_pos(pos)
+
+    def open_file(self):
+        try:
+            file = open(self.file_path,'+r',encoding="utf-8")
             self.file = file
-            self.text = self.file.read()
-      except FileNotFoundError:
-         raise Exception(f"файл {self.file_name} не найден!")
-   
-   def print_text(self):
-      print(self.text)
-   
-   def prepare_text(self):
-      if not self.text:
-         raise Exception(f"файл {self.file_name} пуст!")
-      self.text = self.text.lower()
+        except FileNotFoundError:
+            raise FileNotFoundError("Ошибка! Файл не найден")
+
+    def get_text(self) -> None:
+        self.text = self.file.read()
+        self.file.close()
+
+    def check_empty_file(self):
+        if not self.text:
+            raise RuntimeError("Ошибка! Файл пуст")
+
+    def make_lower(self) -> None:
+        self.check_empty_file()
+        self.text = self.text.lower()
+
+    def clean_text(self) -> None:
+        self.check_empty_file()
+        self.text = re.findall(r"[А-Яа-яёЁ]+", self.text)
+
+    def get_pos(self, pos: list = None) -> None:
+        self.check_empty_file()
+        if not pos:
+            raise Exception("Ошибка! Не указана часть речи")
+        mngr = pymorphy3.MorphAnalyzer()
+        all_words = {mngr.parse(i)[0].normal_form: mngr.parse(i)[0].tag.POS for i in self.text}
+        if len(pos) == 1:
+            print(f"{pos[0]}: {[i for i in all_words if all_words.get(i) == pos[0]]}")
+        else:
+            for part in pos:
+                print(f"{part}: {[i for i in all_words if all_words.get(i) == part]}")
+
+    def print_text(self) -> None:
+        print(self.text)
 
 
-text = TextAnalyser('text.txt')
+TextAnalyzer(file_path="./text.txt", pos=["NOUN"])
